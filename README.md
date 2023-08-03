@@ -9,3 +9,11 @@ It mounts `$STEPPATH` and extends your configuration with the necessary settings
 
 The current working directory is also mounted, meaning relative arguments to files
 under `$PWD` will work.
+
+## Installation
+
+With [μpkg](https://github.com/orbit-online/upkg)
+
+```
+upkg install -g orbit-online/smallstep-wrapper
+```
