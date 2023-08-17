@@ -8,16 +8,13 @@ main() {
   PATH="$pkgroot/.upkg/.bin:$PATH"
   # shellcheck source=.upkg/orbit-online/records.sh/records.sh
   source "$pkgroot/.upkg/orbit-online/records.sh/records.sh"
-  checkdeps docker
+  checkdeps docker jq
 
   STEPPATH=${STEPPATH:-"$HOME/.step"}
   [[ -d "$STEPPATH" ]] || fatal "\$STEPPATH '%s' not found." "$STEPPATH"
 
   local version additional_opts=() cmd=()
-  version=$(jq -r '.version // "latest"' <"$pkgroot/upkg.json")
-  version=${version#'refs/heads/'}
-  [[ ! $version =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]] || version=${version#v}
-  [[ $version != 'master' ]] || version=latest
+  version=$(image-version "$(jq -r '.version' "$pkgroot/upkg.json" 2>/dev/null || git symbolic-ref HEAD)")
 
   local p11_kit_socket="$XDG_RUNTIME_DIR/p11-kit/pkcs11"
   if [[ -S "$p11_kit_socket" ]]; then
