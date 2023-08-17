@@ -15,5 +15,5 @@ under `$PWD` will work.
 With [μpkg](https://github.com/orbit-online/upkg)
 
 ```
-upkg install -g orbit-online/smallstep-wrapper
+upkg install -g orbit-online/smallstep-wrapper@<VERSION>
 ```
