@@ -14,7 +14,7 @@ main() {
   [[ -d "$STEPPATH" ]] || fatal "\$STEPPATH '%s' not found." "$STEPPATH"
 
   local version additional_opts=() cmd=()
-  version=$(image-version "$(jq -r '.version' "$pkgroot/upkg.json" 2>/dev/null || git symbolic-ref HEAD)")
+  version=$(image-version "$(jq -re '.version // empty' "$pkgroot/upkg.json" 2>/dev/null || git symbolic-ref HEAD)")
 
   local p11_kit_socket="$XDG_RUNTIME_DIR/p11-kit/pkcs11"
   if [[ -S "$p11_kit_socket" ]]; then
