@@ -17,7 +17,7 @@ main() {
   version=$(image-version "$(jq -re '.version // empty' "$pkgroot/upkg.json" 2>/dev/null || git symbolic-ref HEAD)")
 
   local p11_kit_socket="$XDG_RUNTIME_DIR/p11-kit/pkcs11"
-  if [[ -S "$p11_kit_socket" ]]; then
+  if [[ -S "$p11_kit_socket" ]] && ! ${STEP_SKIP_P11_KIT:-false}; then
     checkdeps p11tool
     local yubikey_serials=()
     readarray -t yubikey_serials < <(p11tool --list-token-urls | grep manufacturer=Yubico%20%28www.yubico.com%29 | sed 's/.*;serial=\([0-9]\+\);.*/\1/g')
@@ -32,6 +32,8 @@ YubiKey #${yubikey_serials[0]}")
       -e "YKSERIAL=${yubikey_serials[0]}" -e PIN
       -v "$p11_kit_socket:$p11_kit_socket"
     )
+  elif ${STEP_SKIP_P11_KIT:-false}; then
+    verbose "p11-kit socket forwarding disabled"
   else
     verbose "Socket '%s' not found, skipping p11-kit forwarding" "$p11_kit_socket"
   fi
