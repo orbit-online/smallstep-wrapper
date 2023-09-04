@@ -25,8 +25,9 @@ main() {
     [[ ${#yubikey_serials[@]} -eq 1 ]] || fatal "%d YubiKeys detected, remove all but one" "${#yubikey_serials[@]}"
     if [[ -z $PIN ]]; then
       export PIN
-      PIN=$(pinentry-wrapper "PIN" --desc "Smallstep CLI requires access to your YubiKey in order to authenticate with step-ca
-YubiKey #${yubikey_serials[0]}")
+      # shellcheck disable=2059
+      PIN=$(pinentry-wrapper "PIN" --desc "$(printf -- "${STEP_PIN_DESC:-"Smallstep CLI requires access to your YubiKey in order to authenticate with step-ca
+YubiKey #%s"}" "${yubikey_serials[0]}")")
     fi
     additional_opts+=(
       -e "YKSERIAL=${yubikey_serials[0]}" -e PIN
@@ -37,6 +38,11 @@ YubiKey #${yubikey_serials[0]}")
   else
     verbose "Socket '%s' not found, skipping p11-kit forwarding" "$p11_kit_socket"
   fi
+  local envvar
+  for envvar in $(env | grep '^STEP' | cut -d= -f1); do
+    [[ $envvar != 'STEPPATH' ]] || continue
+    additional_opts+=(-e "$envvar")
+  done
   if [[ -t 0 && -t 1 ]]; then
     additional_opts+=("-t")
   else
