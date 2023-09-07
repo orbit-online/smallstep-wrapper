@@ -25,7 +25,7 @@ All `$STEP` prefixed environment variables are forwarded (see the
 for more info).  
 There are also a few env vars that modify the behavior of the wrapper:
 
-| Name                 | Description                                                                                             |
-| -------------------- | ------------------------------------------------------------------------------------------------------- |
-| `$STEP_PIN_DESC`     | Modify the description line when prompting for a YubiKey PIN (`%s` is replaced with the YubiKey serial) |
-| `$STEP_SKIP_P11_KIT` | Do not mount the p11-kit socket                                                                         |
+| Name                 | Description                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------------ |
+| `$STEP_PIN_DESC`     | The description in the YubiKey PIN prompt modal (`%s` is replaced with the YubiKey serial) |
+| `$STEP_SKIP_P11_KIT` | Do not mount the p11-kit socket (`true`/`false`)                                           |
