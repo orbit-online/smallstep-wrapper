@@ -3,9 +3,8 @@
 A containerized smallstep step-cli that mounts your p11-kit socket (if it exists)
 and configures communication with your YubiKey.
 
-It mounts `$STEPPATH` and extends your configuration with the necessary settings.
-`$STEPPATH` in the config will be replaced with the mounted path inside the container
-(currently only implemented for the `root` setting).
+The config is bootstrapped through the environment variables `$STEP_URL` and
+`$STEP_ROOT_FP`.
 
 The current working directory is also mounted, meaning relative arguments to files
 under `$PWD` will work.
@@ -27,5 +26,7 @@ There are also a few env vars that modify the behavior of the wrapper:
 
 | Name                 | Description                                                                                |
 | -------------------- | ------------------------------------------------------------------------------------------ |
+| `$STEP_URL`          | URL to the step-ca `required`                                                              |
+| `$STEP_ROOT_FP`      | Fingerprint of the step-ca root certificate `required`                                     |
 | `$STEP_PIN_DESC`     | The description in the YubiKey PIN prompt modal (`%s` is replaced with the YubiKey serial) |
 | `$STEP_SKIP_P11_KIT` | Do not mount the p11-kit socket (`true`/`false`)                                           |

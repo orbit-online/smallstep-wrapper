@@ -1,13 +1,20 @@
 #!/usr/bin/env bash
 
-main() {
+step_wrapper() {
   set -eo pipefail
   shopt -s inherit_errexit
 
-  export STEPPATH=$HOME/.step
-  local config config_path=$HOME/.step/config/defaults.json
-  config=$(cat /step-config-template.json)
-  config=$(jq '.root=(.root | sub("\\$STEPPATH"; "/external-steppath"; "g"))' <<<"$config")
+  export STEPPATH=${HOME:?}/.step
+  local bs_out bs_ret
+  if bs_out=$(step ca bootstrap --ca-url="${STEP_URL:?}" --fingerprint="${STEP_ROOT_FP:?}" 2>&1); then
+    :
+  else
+    bs_ret=$?
+    printf "%s\n" "$bs_out" >&2
+    return $bs_ret
+  fi
+  local config config_path=$STEPPATH/config/defaults.json
+  config=$(cat "$config_path")
   if [[ -n $YKSERIAL ]]; then
     config=$(jq --arg serial "${YKSERIAL:?}" --arg pin "${PIN:?}" \
       '.kms="pkcs11:module-path=/usr/lib/pkcs11/p11-kit-client.so;token=YubiKey%20PIV%20%23\($serial)?pin-value=\($pin)" |
@@ -18,4 +25,4 @@ main() {
   exec step "$@"
 }
 
-main "$@"
+step_wrapper "$@"

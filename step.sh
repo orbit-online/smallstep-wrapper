@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-main() {
+step() {
   set -eo pipefail
   shopt -s inherit_errexit
   local pkgroot
@@ -10,8 +10,8 @@ main() {
   source "$pkgroot/.upkg/orbit-online/records.sh/records.sh"
   checkdeps docker jq
 
-  STEPPATH=${STEPPATH:-"$HOME/.step"}
-  [[ -d "$STEPPATH" ]] || fatal "\$STEPPATH '%s' not found." "$STEPPATH"
+  : "${STEP_URL:?"\$STEP_URL is required"}"
+  : "${STEP_ROOT_FP:?"\$STEP_ROOT_FP is required"}"
 
   local version additional_opts=() cmd=()
   version=$(image-version "$(jq -re '.version // empty' "$pkgroot/upkg.json" 2>/dev/null || git symbolic-ref HEAD)")
@@ -61,14 +61,10 @@ YubiKey #%s"}" "${yubikey_serials[0]}")")
   # shellcheck disable=2086,2068
   docker run --rm -i \
     ${additional_opts[@]} \
-    -e TMP=/tmp --tmpfs /tmp \
-    -e HOME -e "UID=$(id -u)" \
-    -v "$PWD:$HOME/pwd" \
-    --tmpfs $HOME/.step/config \
-    -v "$STEPPATH:/external-steppath:ro" \
-    -v "$STEPPATH/config/defaults.json:/step-config-template.json:ro" \
+    -e TMP=/tmp --tmpfs /tmp -e HOME -e "UID=$(id -u)" \
+    -v "$PWD:$HOME/pwd" --tmpfs $HOME/.step \
     "secoya/smallstep-wrapper:$version" \
     ${cmd[@]}
 }
 
-main "$@"
+step "$@"
