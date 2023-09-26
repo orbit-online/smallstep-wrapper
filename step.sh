@@ -13,8 +13,9 @@ step() {
   : "${STEP_URL:?"\$STEP_URL is required"}"
   : "${STEP_ROOT_FP:?"\$STEP_ROOT_FP is required"}"
 
-  local version additional_opts=() cmd=()
+  local version image additional_opts=() cmd=()
   version=$(image-version "$(jq -re '.version // empty' "$pkgroot/upkg.json" 2>/dev/null || git symbolic-ref HEAD)")
+  image=secoya/smallstep-wrapper:$version
 
   local p11_kit_socket="$XDG_RUNTIME_DIR/p11-kit/pkcs11"
   if [[ -S "$p11_kit_socket" ]] && ! ${STEP_SKIP_P11_KIT:-false}; then
@@ -58,8 +59,9 @@ YubiKey #%s"}" "${yubikey_serials[0]}")")
   else
     cmd=(step-wrapper "$@")
   fi
+  [[ $(docker images -q "$image" 2>/dev/null) != "" ]] || info "Pulling %s" "$image"
   # shellcheck disable=2086,2068
-  docker run --rm -i \
+  docker run --quiet --rm -i \
     ${additional_opts[@]} \
     -e TMP=/tmp --tmpfs /tmp -e HOME -e "UID=$(id -u)" \
     -v "$PWD:$HOME/pwd" --tmpfs $HOME/.step \
