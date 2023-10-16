@@ -14,7 +14,7 @@ step() {
   : "${STEP_ROOT_FP:?"\$STEP_ROOT_FP is required"}"
 
   local version image additional_opts=() cmd=()
-  version=$(image-version "$(jq -re '.version // empty' "$pkgroot/upkg.json" 2>/dev/null || git symbolic-ref HEAD)")
+  version=$(image-version "$(jq -re '.version // empty' "$pkgroot/upkg.json" 2>/dev/null || git -C "$pkgroot" symbolic-ref HEAD)")
   image=secoya/smallstep-wrapper:$version
 
   local p11_kit_socket="$XDG_RUNTIME_DIR/p11-kit/pkcs11"
