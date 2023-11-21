@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 step_wrapper() {
-  set -eo pipefail
-  shopt -s inherit_errexit
+  set -eo pipefail; shopt -s inherit_errexit
 
   export STEPPATH=${HOME:?}/.step
   local bs_out bs_ret
