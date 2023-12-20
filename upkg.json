@@ -1,8 +1,8 @@
 {
   "dependencies": {
-    "orbit-online/checkdeps": "v1.0.0",
-    "orbit-online/records.sh": "v0.9.3",
-    "orbit-online/pinentry-wrapper": "v0.10.1",
+    "orbit-online/checkdeps": "v1.0.1",
+    "orbit-online/records.sh": "v0.9.5",
+    "orbit-online/pinentry-wrapper": "v0.10.2",
     "orbit-online/image-version": "v0.9.1"
   },
   "commands": {
