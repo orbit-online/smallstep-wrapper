@@ -26,3 +26,6 @@ jobs:
         file: Dockerfile
         tags: secoya/smallstep-wrapper:${{ steps.version.outputs.version }}
         push: true
+        build-args: |
+          "BUILD_TOOL=github"
+          "BUILT_BY=${{ github.actor }}"

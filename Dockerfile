@@ -1,4 +1,6 @@
 FROM smallstep/step-kms-plugin:0.8.2
+ARG BUILT_BY=<unknown> BUILD_TOOL=cli
+LABEL cr.orbit.dev/build-src="https://github.com/orbit-online/smallstep-wrapper" cr.orbit.dev/built-by=$BUILT_BY cr.orbit.dev/build-tool=$BUILD_TOOL
 USER root
 WORKDIR /
 RUN deluser step
