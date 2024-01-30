@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-set -eo pipefail
-shopt -s inherit_errexit
-
-PKGROOT=$(upkg root "${BASH_SOURCE[0]}")
+set -eo pipefail; shopt -s inherit_errexit
+PKGROOT=$(dirname "$(realpath "${BASH_SOURCE[0]}")")
 
 main() {
   docker build \
