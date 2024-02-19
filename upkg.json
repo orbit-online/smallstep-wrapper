@@ -2,7 +2,7 @@
   "dependencies": {
     "orbit-online/checkdeps": "v1.0.2",
     "orbit-online/records.sh": "v0.9.5",
-    "orbit-online/pinentry-wrapper": "v0.10.3",
+    "orbit-online/pinentry-wrapper": "v0.10.4",
     "orbit-online/image-version": "v0.9.1",
     "orbit-online/path-tools": "v0.2.1"
   },
