@@ -11,11 +11,7 @@ under `$PWD` will work.
 
 ## Installation
 
-With [μpkg](https://github.com/orbit-online/upkg)
-
-```
-upkg install -g orbit-online/smallstep-wrapper@<VERSION>
-```
+See [the latest release](https://github.com/orbit-online/smallstep-wrapper/releases/latest) for instructions.
 
 ## Environment variables
 
