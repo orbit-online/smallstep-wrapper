@@ -14,9 +14,13 @@ step() {
   : "${STEP_URL:?"\$STEP_URL is required"}"
   : "${STEP_ROOT_FP:?"\$STEP_ROOT_FP is required"}"
 
-  local version image additional_opts=() cmd=()
-  version=$(image-version "$(jq -re '.version // empty' "$pkgroot/upkg.json" 2>/dev/null || git -C "$pkgroot" symbolic-ref HEAD)")
-  image=secoya/smallstep-wrapper:$version
+  local program_version image additional_opts=() cmd=()
+  if program_version=$(jq -re '.version // empty' "$pkgroot/upkg.json" 2>/dev/null); then
+    image=secoya/smallstep-wrapper:${program_version#v}
+  else
+    GIT_VERSION=$(git -C "$pkgroot" symbolic-ref HEAD)
+    image=secoya/smallstep-wrapper:$(image-version "$GIT_VERSION")
+  fi
 
   local p11_kit_socket="$XDG_RUNTIME_DIR/p11-kit/pkcs11"
   if [[ -S "$p11_kit_socket" ]] && ! ${STEP_SKIP_P11_KIT:-false}; then
@@ -68,7 +72,7 @@ step() {
     ${additional_opts[@]} \
     -e TMP=/tmp --tmpfs /tmp -e HOME -e "UID=$(id -u)" \
     -v "$PWD:$HOME/pwd" --tmpfs $HOME/.step \
-    "secoya/smallstep-wrapper:$version" \
+    "$image" \
     ${cmd[@]}
 }
 
