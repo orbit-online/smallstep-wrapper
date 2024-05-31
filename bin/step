@@ -4,12 +4,11 @@
 step() {
   set -eo pipefail; shopt -s inherit_errexit
   local pkgroot; pkgroot=$(realpath "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/..")
-  PATH=$("$pkgroot/.upkg/.bin/path_prepend" "$pkgroot/.upkg/.bin")
   # shellcheck disable=SC1091
   source "$pkgroot/.upkg/records.sh/records.sh"
   # shellcheck disable=SC1091
   source "$pkgroot/.upkg/collections.sh/collections.sh"
-  checkdeps docker jq
+  "$pkgroot/.upkg/.bin/checkdeps" docker jq
 
   : "${STEP_URL:?"\$STEP_URL is required"}"
   : "${STEP_ROOT_FP:?"\$STEP_ROOT_FP is required"}"
@@ -19,12 +18,12 @@ step() {
     image=secoya/smallstep-wrapper:${program_version#v}
   else
     GIT_VERSION=$(git -C "$pkgroot" symbolic-ref HEAD)
-    image=secoya/smallstep-wrapper:$(image-version "$GIT_VERSION")
+    image=secoya/smallstep-wrapper:$("$pkgroot/.upkg/.bin/image-version" "$GIT_VERSION")
   fi
 
   local p11_kit_socket="$XDG_RUNTIME_DIR/p11-kit/pkcs11"
   if [[ -S "$p11_kit_socket" ]] && ! ${STEP_SKIP_P11_KIT:-false}; then
-    checkdeps p11tool
+    "$pkgroot/.upkg/.bin/checkdeps" p11tool
     local token_urls=() token_filter=(
       'manufacturer=Yubico%20%28www.yubico.com%29'
       'model=Intel.*serial=0000000000000000;token=.\+'
@@ -35,7 +34,7 @@ step() {
     if [[ -z $PIN ]]; then
       export PIN
       # shellcheck disable=2059
-      PIN=$(pinentry-wrapper "PIN" --desc "$(printf -- "${STEP_PIN_DESC:-"Smallstep CLI requires access to your smartcard in order to authenticate with step-ca"}" "${token_urls[0]}")")
+      PIN=$("$pkgroot/.upkg/.bin/pinentry-wrapper" "PIN" --desc "$(printf -- "${STEP_PIN_DESC:-"Smallstep CLI requires access to your smartcard in order to authenticate with step-ca"}" "${token_urls[0]}")")
     fi
     additional_opts+=(
       -e "TOKEN_URL=${token_urls[0]}" -e PIN
