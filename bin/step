@@ -24,20 +24,18 @@ step() {
   local p11_kit_socket="$XDG_RUNTIME_DIR/p11-kit/pkcs11"
   if [[ -S "$p11_kit_socket" ]] && ! ${STEP_SKIP_P11_KIT:-false}; then
     "$pkgroot/.upkg/.bin/checkdeps" p11tool
-    local token_urls=() token_filter=(
-      'manufacturer=Yubico%20%28www.yubico.com%29'
-      'model=Intel.*serial=0000000000000000;token=.\+'
-    )
-    readarray -t token_urls < <(p11tool --list-token-urls | grep "$(join_by $'\n' "${token_filter[@]}")")
-    [[ ${#token_urls[@]} -gt 0 ]] || fatal "No smartcards found"
-    [[ ${#token_urls[@]} -eq 1 ]] || fatal "%d smartcards detected, remove all but one" "${#token_urls[@]}"
+    local yubikey_serials=()
+    readarray -t yubikey_serials < <(p11tool --list-token-urls | grep manufacturer=Yubico%20%28www.yubico.com%29 | sed 's/.*;serial=\([0-9]\+\);.*/\1/g')
+    [[ ${#yubikey_serials[@]} -gt 0 ]] || fatal "No YubiKeys found"
+    [[ ${#yubikey_serials[@]} -eq 1 ]] || fatal "%d YubiKeys detected, remove all but one" "${#yubikey_serials[@]}"
     if [[ -z $PIN ]]; then
       export PIN
       # shellcheck disable=2059
-      PIN=$("$pkgroot/.upkg/.bin/pinentry-wrapper" "PIN" --desc "$(printf -- "${STEP_PIN_DESC:-"Smallstep CLI requires access to your smartcard in order to authenticate with step-ca"}" "${token_urls[0]}")")
+      PIN=$("$pkgroot/.upkg/.bin/pinentry-wrapper" "PIN" --desc "$(printf -- "${STEP_PIN_DESC:-"Smallstep CLI requires access to your YubiKey in order to authenticate with step-ca
+YubiKey #%s"}" "${yubikey_serials[0]}")")
     fi
     additional_opts+=(
-      -e "TOKEN_URL=${token_urls[0]}" -e PIN
+      -e "YKSERIAL=${yubikey_serials[0]}" -e PIN
       -v "$p11_kit_socket:$p11_kit_socket"
     )
   elif ${STEP_SKIP_P11_KIT:-false}; then
